@@ -10,6 +10,7 @@ python = "^3.12"
 requests = "^2.32.3"
 pandas = "^2.2.3"
 transformers = "^4.48.1"
+torch = "^2.5.1"
 
 
 [build-system]
