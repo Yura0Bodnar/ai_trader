@@ -1,6 +1,7 @@
 import requests
 import time
 import pandas as pd
+import os
 
 # Базовий URL ендпоінта
 BASE_URL = "https://api.bybit.com/v5/market/orderbook"
@@ -18,6 +19,12 @@ current_time = int(time.time() * 1000)  # Поточний час у міліс�
 
 # Змінна для збору результатів
 all_orderbooks = []
+
+# Визначення шляху до папки data
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Поточна директорія файлу
+data_dir = os.path.join(current_dir, '..', 'data')  # Перехід на рівень вище і до папки data
+os.makedirs(data_dir, exist_ok=True)  # Створення папки, якщо вона не існує
+
 
 # Цикл для виконання запитів
 for i in range(iterations):
@@ -43,15 +50,12 @@ for i in range(iterations):
             asks = result["a"]    # Аски (продавці)
             bids = result["b"]    # Біди (покупці)
             timestamp = result["ts"]  # Час у мілісекундах
-            update_id = result["u"]   # Update ID
-            seq = result["seq"]       # Cross sequence
-            creation_time = result["cts"]  # Час створення
 
             # Формування даних
             for ask in asks:
-                all_orderbooks.append([symbol, "ask", float(ask[0]), float(ask[1]), timestamp, update_id, seq, creation_time])
+                all_orderbooks.append([symbol, "ask", float(ask[0]), float(ask[1]), timestamp])
             for bid in bids:
-                all_orderbooks.append([symbol, "bid", float(bid[0]), float(bid[1]), timestamp, update_id, seq, creation_time])
+                all_orderbooks.append([symbol, "bid", float(bid[0]), float(bid[1]), timestamp])
 
             print(f"Ітерація {i + 1}: отримано {len(asks) + len(bids)} записів")
         else:
@@ -70,7 +74,7 @@ table["timestamp"] = pd.to_numeric(table["timestamp"])  # Явне перетв�
 table["timestamp"] = pd.to_datetime(table["timestamp"], unit="ms")
 
 # Збереження у CSV
-csv_file = "orderbook_history.csv"
+csv_file = os.path.join(data_dir, "orderbook_history.csv")
 table.to_csv(csv_file, index=False)
 print(f"Дані збережено у файл {csv_file}")
 

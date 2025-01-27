@@ -1,5 +1,6 @@
 import requests
 import pandas as pd
+import os
 
 # Базовий URL ендпоінта
 BASE_URL = "https://api.bybit.com/v5/market/historical-volatility"
@@ -17,6 +18,12 @@ params = {
     "baseCoin": base_coin,
     "period": period,
 }
+
+# Визначення шляху до папки data
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Поточна директорія файлу
+data_dir = os.path.join(current_dir, '..', 'data')  # Перехід на рівень вище і до папки data
+os.makedirs(data_dir, exist_ok=True)  # Створення папки, якщо вона не існує
+
 
 try:
     # Перший запит
@@ -58,6 +65,11 @@ for i in range(iterations):
 
     print(f"\nЗапит #{i + 2}: Параметри -> {params}")
 
+    # Визначення шляху до папки data
+    current_dir = os.path.dirname(os.path.abspath(__file__))  # Поточна директорія файлу
+    data_dir = os.path.join(current_dir, '..', 'data')  # Перехід на рівень вище і до папки data
+    os.makedirs(data_dir, exist_ok=True)  # Створення папки, якщо вона не існує
+
     try:
         # Виконання запиту
         response = requests.get(BASE_URL, params=params)
@@ -92,7 +104,7 @@ if all_volatility_data:
     volatility_table["timestamp"] = pd.to_datetime(volatility_table["timestamp"], unit="ms")
 
     # Збереження у CSV
-    csv_file = "historical_volatility.csv"
+    csv_file = os.path.join(data_dir, "historical_volatility.csv")
     volatility_table.to_csv(csv_file, index=False)
     print(f"Дані збережено у файл {csv_file}")
 

@@ -1,6 +1,7 @@
 import requests
 import time
 import pandas as pd
+import os
 
 # Базовий URL ендпоінта
 BASE_URL = "https://api.bybit.com/v5/market/funding/history"
@@ -17,6 +18,11 @@ current_time = int(time.time() * 1000)  # Поточний час у міліс�
 
 # Змінна для збору результатів
 all_funding_rates = []
+
+# Визначення шляху до папки data
+current_dir = os.path.dirname(os.path.abspath(__file__))  # Поточна директорія файлу
+data_dir = os.path.join(current_dir, '..', 'data')  # Перехід на рівень вище і до папки data
+os.makedirs(data_dir, exist_ok=True)  # Створення папки, якщо вона не існує
 
 # Цикл для виконання запитів
 for i in range(iterations):
@@ -63,7 +69,7 @@ table["timestamp"] = pd.to_numeric(table["timestamp"])  # Явне перетв�
 table["timestamp"] = pd.to_datetime(table["timestamp"], unit="ms")
 
 # Збереження у CSV
-csv_file = "funding_rate_history.csv"
+csv_file = os.path.join(data_dir, "funding_rate_history.csv")
 table.to_csv(csv_file, index=False)
 print(f"Дані збережено у файл {csv_file}")
 
